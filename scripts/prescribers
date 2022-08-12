@@ -58,3 +58,37 @@ WHERE total_claim_count IS NULL
 GROUP BY specialty_description; 
 
 --Question 2c Answer: 92 rows of specialties
+
+/*Question 2d: For each specialty, report the percentage of total claims by that specialty which are for opioids. Which specialties have a high percentage of opioids?*/
+
+
+
+--Question 2d Answer: 
+
+/*Question 3a: Which drug (generic_name) had the highest total drug cost?*/
+
+SELECT d.generic_name, ROUND(SUM(p.total_drug_cost), 2) AS total_cost
+FROM drug AS d
+LEFT JOIN prescription AS p 
+ON p.drug_name = d.drug_name
+WHERE p.total_drug_cost IS NOT NULL
+GROUP BY d.generic_name
+ORDER BY total_cost DESC;
+
+--Question 3a Answer: Insulin Glargine, $104,246,066.35
+
+/*Question 3b: Which drug (generic_name) has the highest total cost per day? Round your cost per day column to 2 decimal places.*/
+
+SELECT d.generic_name, ROUND((SUM(p.total_drug_cost)) / SUM(p.total_day_supply), 2) AS total_cost_per_day
+FROM drug AS d
+LEFT JOIN prescription AS p 
+ON p.drug_name = d.drug_name
+WHERE p.total_drug_cost IS NOT NULL
+GROUP BY d.generic_name
+ORDER BY total_cost_per_day DESC;
+
+--Question 3b Answer: C1 Esterase Inhibitor, 3,495.22
+
+/*Question 4a: For each drug in the drug table, return the drug name and then a column named 'drug_type' which says 'opioid' for drugs which have opioid_drug_flag = 'Y', says 'antibiotic' for those drugs which have antibiotic_drug_flag = 'Y', and says 'neither' for all other drugs.*/
+
+
