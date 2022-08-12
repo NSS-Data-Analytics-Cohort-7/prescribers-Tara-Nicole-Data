@@ -32,7 +32,7 @@ WHERE p1.total_claim_count IS NOT NULL
 GROUP BY p2.specialty_description
 ORDER BY claims DESC; 
 
---Question 2a: Family Practice - 9,752,347
+--Question 2a Answer: Family Practice - 9,752,347
 
 /*Question 2b: Which specialty had the most total number of claims for opiods?*/
 
@@ -46,12 +46,15 @@ WHERE total_claim_count IS NOT NULL AND opioid_drug_flag = 'Y' OR long_acting_op
 GROUP BY specialty_description
 ORDER BY total_opioid_claims DESC; 
 
---Question 2b: Nurse Practitioner 900,845
+--Question 2b Answer: Nurse Practitioner 900,845
 
 /*Question 2c: Are there any specialties that appear in the prescriber table that have no associated prescriptions in the prescription table?*/
 
-SELECT specialty_description, total_claim_count
+SELECT p1.specialty_description, COUNT(p2.total_claim_count)
 FROM prescriber AS p1
 LEFT JOIN prescription AS p2
 ON p1.npi = p2.npi
+WHERE total_claim_count IS NULL
+GROUP BY specialty_description; 
 
+--Question 2c Answer: 92 rows of specialties
