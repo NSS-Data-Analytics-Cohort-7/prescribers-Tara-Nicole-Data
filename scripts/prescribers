@@ -8,7 +8,7 @@ WHERE p1.total_claim_count IS NOT NULL
 GROUP BY p2.npi, p2.nppes_provider_first_name, p2.nppes_provider_last_org_name
 ORDER BY claims DESC; 
 
---Question 1a Answer: 1881634483 - Bruce Pendley, Total Claims - 99707
+--Question 1a Answer: 1,881,634,483 - Bruce Pendley, Total Claims - 99,707
 
 /*Question 1b: Repeat the above, but this time report the nppes_provider_first_name, nppes_provider_last_org_name, specialty_description, and the total number of claims.*/
 
@@ -91,4 +91,46 @@ ORDER BY total_cost_per_day DESC;
 
 /*Question 4a: For each drug in the drug table, return the drug name and then a column named 'drug_type' which says 'opioid' for drugs which have opioid_drug_flag = 'Y', says 'antibiotic' for those drugs which have antibiotic_drug_flag = 'Y', and says 'neither' for all other drugs.*/
 
+SELECT drug_name, 
+(CASE WHEN opioid_drug_flag = 'Y' THEN 'opioid'
+    WHEN antibiotic_drug_flag = 'Y' THEN 'antibiotic'
+    ELSE 'neither' END) AS drug_type
+FROM drug;
+
+--Question 4a Answer: Successful
+
+/*Question 4b: Determine whether more was spent (total_drug_cost) on opioids or on antibiotics. Hint: Format the total costs as MONEY for easier comparison.*/
+
+SELECT (CASE WHEN opioid_drug_flag = 'Y' THEN 'opioid'
+    WHEN antibiotic_drug_flag = 'Y' THEN 'antibiotic'
+    ELSE 'neither' END) AS drug_type, 
+MONEY(SUM(total_drug_cost))
+FROM drug AS d
+JOIN prescription AS p
+USING(drug_name)
+GROUP BY drug_type
+ORDER BY MONEY; 
+
+--Question 4b Answer: Opioids, $105,080,626.37
+
+/*Question 5a: How many CBSAs are in Tennessee?*/
+
+SELECT COUNT(DISTINCT cbsaname)
+FROM cbsa
+WHERE cbsaname LIKE '%TN%';
+
+--Question 5a Answer: 10
+
+/*Question 5b: Which cbsa has the largest combined population? Which has the smallest? Report the CBSA name and total population.*/
+
+SELECT c.cbsaname, SUM(p.population) AS total_population
+FROM cbsa AS c
+JOIN population AS p
+USING(fipscounty)
+GROUP BY c.cbsaname
+ORDER BY total_population;
+
+/*Question 5b Answer: Largest - Nashville-Davidson-Murfreesboro-Franklin, TN, 1,830,410
+                      Smallest - Morristown, TN, 116,352*/
+                      
 
