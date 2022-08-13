@@ -133,4 +133,54 @@ ORDER BY total_population;
 /*Question 5b Answer: Largest - Nashville-Davidson-Murfreesboro-Franklin, TN, 1,830,410
                       Smallest - Morristown, TN, 116,352*/
                       
+/*Question 5c: What is the largest (in terms of population) county which is not included in the CBSA? Report the county name and population.*/
+
+SELECT p.fipscounty, f.county, SUM(p. population) AS total_population
+FROM population AS p
+LEFT JOIN cbsa AS c
+USING (fipscounty)
+JOIN fips_county AS f
+USING (fipscounty)
+WHERE c.fipscounty IS NULL
+GROUP BY p.fipscounty, f.county  
+ORDER BY total_population DESC; 
+
+--Question 5c Answer: Sevier, 95,523
+
+/*Question 6a: Find all rows in the prescription table where total_claims is at least 3000. Report the drug_name and the total_claim_count.*/ 
+
+SELECT drug_name, total_claim_count
+FROM prescription 
+WHERE total_claim_count >= 3000
+GROUP BY drug_name, total_claim_count
+ORDER BY total_claim_count DESC; 
+
+--Question 6a Answer: 9 rows
+
+/*Question 6b: For each instance you found in part a, add a column that indicates whether the drug is an opioid.*/ 
+
+SELECT drug_name, total_claim_count, 
+    CASE WHEN opioid_drug_flag = 'Y' THEN 'Y' ELSE 'N' END AS is_opioid
+FROM prescription
+JOIN drug
+USING(drug_name)
+WHERE total_claim_count >= 3000
+ORDER BY total_claim_count DESC;
+
+--Question 6b Answer: 2 rows are opioids
+
+/*Question 6c: Add another column to your answer from the previous part which gives the prescriber first and last name associated with each row.*/
+
+SELECT nppes_provider_last_org_name, nppes_provider_first_name, drug_name, SUM(total_claim_count) AS total_claims, 
+    CASE WHEN opioid_drug_flag = 'Y' THEN 'Y' ELSE 'N' END AS is_opioid
+FROM prescription
+JOIN drug 
+USING(drug_name)
+JOIN prescriber 
+USING(npi)
+WHERE total_claim_count >= 3000
+GROUP BY nppes_provider_last_org_name, nppes_provider_first_name, drug_name, is_opioid
+ORDER BY total_claims DESC;
+
+
 
